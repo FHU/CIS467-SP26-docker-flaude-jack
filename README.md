@@ -82,6 +82,19 @@ curl -I http://localhost:8080/
 ### 0.1 - Reflection Question
 > What headers does nginx send by default? Are any of them surprising?
 
+> These are the headers that nginx sends by default:
+```
+Server: nginx/1.29.5
+Date: Wed, 11 Mar 2026 18:22:05 GMT
+Content-Type: text/html
+Content-Length: 19820
+Last-Modified: Mon, 09 Mar 2026 18:24:42 GMT
+Connection: keep-alive
+ETag: "69af106a-4d6c"
+Accept-Ranges: bytes
+```
+> None of these are really that surprising. I didn't really know about Etag and Connection
+
 ---
 
 ## Checkpoint 1 — Compression
@@ -112,6 +125,8 @@ check the **Response Headers** panel.
 
 ### 1.1 Reflection Question
 > Why does `gzip_min_length` exist? What's the cost of compressing a 200-byte file?
+
+> It isn't worth doing the work that's required to zip a file that small
 
 ---
 
