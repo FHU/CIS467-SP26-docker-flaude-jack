@@ -129,7 +129,7 @@ check the **Response Headers** panel.
 > Why does `gzip_min_length` exist? What's the cost of compressing a 200-byte file?
 
 > According to ChatGPT: 'gzip_min_length' exists to set a minimum file size before compression is applied. This helps prevent the server from wasting resources compressing very small files, where the compression overhead may outweigh the benefits.
-> Building on to the next question, you don't want to zip a file that is small and doesn't need to be zipped. That's why you set a mininum amount. So zipping a 200-byte file would be unreasonable because it would essentially be a waste of work for the CPU.
+> Building on to the next question, you don't want to zip a file that is small and doesn't need to be zipped. That's why you set the mininum amount of bytes you want for a file to be zippped. So, zipping a 200-byte file would be unreasonable because it would essentially be a waste of work for the CPU.
 
 ---
 
@@ -171,7 +171,7 @@ Confirm different `Cache-Control` values on each response.
 
 
 >Caching index.html aggressively can be dangerous for a single-page application because index.html is the file that tells the browser which JavaScript and CSS bundles to load. If it becomes stale, the browser may try to load files that no longer exist or no longer match the current version of the app.
->If that were too happen the page would throw 404 errors, blank screens, or the app just wouldn't function properly.
+>If that were to happen the page would throw 404 errors, blank screens, or the app just wouldn't function properly.
 
 ---
 
@@ -209,7 +209,7 @@ a tunneling tool, or deploy to a VPS for full scoring).
 > and observe the browser console error. What does this teach you about
 > how CSP is enforced?
 
->This shows that CSP is enforced by checking everything that the browser tries to load based on its set of rules. So our inline script was not liked by the CSP since it was apart of our rules. 
+>This shows that CSP is enforced by checking everything that the browser tries to load based on its set of rules. So our inline script was not liked by the CSP since it was apart of its rules to not allow on the server.
 
 ---
 
