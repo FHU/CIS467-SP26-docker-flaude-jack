@@ -81,10 +81,9 @@ curl -I http://localhost:8080/
 
 ### 0.1 - Reflection Question
 > What headers does nginx send by default? Are any of them surprising?
-> I didn't know what ETag was so I looked it up. 
-> 
-> According ot Claude: An ETag (Entity Tag) is an HTTP response header used for cache validation. It's a unique identifier — typically a hash or fingerprint — that represents a specific version of a resource.
 
+
+> Here are the headers:
 ```
 Server: nginx/1.29.5
 Date: Wed, 11 Mar 2026 18:21:54 GMT
@@ -95,6 +94,8 @@ Connection: keep-alive
 ETag: "69b1aaac-4d6c"
 Accept-Ranges: bytes 
 ```
+> The only thing that was surprising was the ETag which I didn't know about. 
+> According to Claude: An ETag (Entity Tag) is an HTTP response header used for cache validation. It's a unique identifier — typically a hash or fingerprint — that represents a specific version of a resource.
 
 ---
 
@@ -126,6 +127,9 @@ check the **Response Headers** panel.
 
 ### 1.1 Reflection Question
 > Why does `gzip_min_length` exist? What's the cost of compressing a 200-byte file?
+
+> According to ChatGPT: 'gzip_min_length' exists to set a minimum file size before compression is applied. This helps prevent the server from wasting resources compressing very small files, where the compression overhead may outweigh the benefits.
+> Building on to the next question, you don't want to zip a file that is small and doesn't need to be zipped. That's why you set a mininum amount. So zipping a 200-byte file would be unreasonable because it would essentially be a waste of work for the CPU.
 
 ---
 
@@ -165,6 +169,10 @@ Confirm different `Cache-Control` values on each response.
 > What would happen if a user's browser cached a stale `index.html` pointing to
 > old JS bundles?
 
+
+>Caching index.html aggressively can be dangerous for a single-page application because index.html is the file that tells the browser which JavaScript and CSS bundles to load. If it becomes stale, the browser may try to load files that no longer exist or no longer match the current version of the app.
+>If that were too happen the page would throw 404 errors, blank screens, or the app just wouldn't function properly.
+
 ---
 
 ## Checkpoint 3 — Security Headers
@@ -200,6 +208,8 @@ a tunneling tool, or deploy to a VPS for full scoring).
 > Break the CSP intentionally — add an inline `<script>` tag to `index.html`
 > and observe the browser console error. What does this teach you about
 > how CSP is enforced?
+
+>This shows that CSP is enforced by checking everything that the browser tries to load based on its set of rules. So our inline script was not liked by the CSP since it was apart of our rules. 
 
 ---
 
@@ -247,7 +257,9 @@ error_page 404 /404.html;
 > If every route returns `index.html` with a 200, what are the SEO implications?
 > How do SSR frameworks like Next.js solve this problem?
 
----
+>If every route returns `index.html` with a 200, then search engines may index bad URL's, invalid pages, and 
+they may miss page-sepcific content.
+>Next.Js helps solve this issue by rendering real HTML for every route, returning correct status codes, and delivering pre-rendered pages to crawlers immediately.
 
 ## Checkpoint 5 — Rate Limiting
 
@@ -284,6 +296,8 @@ Some responses should return `429 Too Many Requests` once the burst is exhausted
 ### 5.1 - Reflection Question
 > Rate limiting on a static site might seem overkill — when would it actually
 > matter in production?
+
+>Rate limiting would matter if someone was trying to acutally hack your site. It would also save you money because it's limitng CPU usage, memory, and the number of database connections on the host server.
 
 ---
 
@@ -323,6 +337,10 @@ curl -I http://localhost:8080/.env
 > Why return `404` instead of `403 Forbidden`? What information does each
 > status code leak to an attacker?
 
+> You would want to return a 404 if a user is trying to access sensitive data in order to not let them know they're accessing sensitve data. You never know who the user is and what their intent might be.
+
+> A 404 error means the requested page or resource could not be found by the server, whereas a 403 error means the server found the resource but is refusing to allow you access to it. 
+
 ---
 
 ## Final nginx.conf
@@ -336,10 +354,18 @@ You should have a complete, working config. Review it as a whole and identify an
 Submit a short written response (200-500 words) answering the following:
 
 1. Which configuration had the most visible impact when you verified it? Why?
+
+> I would say the security headers had the most visible impact mainly because it didn't show any of the web page's content. All I was able to see was an NGINX server page.
+
 2. Choose one header or directive you added. Research what a real-world attack
    looks like that it mitigates, and describe it briefly.
+
+> One topic I was curious to look into was the last section about attackers trying to find exposed secrets and environment variables. An interesting attack I saw was about looking for git directories on web servers. They use a tool called git-dumper to scan for git directories on a web server. If it exists then they dowload the `.git/config` and `.git/index` files. Then it reconstructs the entire repository locally, which inclues the full commit history. Now that they have access, they can do a grep command to look for secrets. And since they have access to commit history, most of the time they can find them. Automated scanners like Shodan bots and tools like `dirsearch` probe millions of IPs daily, specifically checking for /.git/HEAD. That's what makes this command in the config file so very important.
+
 3. What does this lab reveal about what managed hosting platforms like Netlify
    are silently doing on your behalf?
+
+   > This lab really opened up my eyes to why people have made it their job to make it easy to deploy to the web. This saves developers A LOT of trouble to be able to deploy quickly and securely. There's so much that the average person doesn't know about how the internet works and how internet security is implemented.   
 
 ---
 
